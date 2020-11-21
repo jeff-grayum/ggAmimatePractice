@@ -1,0 +1,58 @@
+---
+title: "gganimatePractice"
+author: "Jeff Grayum"
+date: "11/21/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Loading libraries.
+```{r}
+library(tidyverse)
+library(gganimate)
+library(gapminder)
+library(ggthemes)
+```
+
+Making base graph of gdpPerCap vs lifeExp
+```{r}
+gapminder%>%
+  ggplot(aes(gdpPercap, lifeExp, color = continent, size = pop)) +
+  geom_point() +
+  labs(x = "GDP per capita",
+       y = "Life Expectancy",
+       color = "Continent",
+       size = "Population",
+       title = "Comparing life expectancy with a countries GDP per capita")
+```
+
+Make that basic graph look beautiful.
+```{r}
+gapminder%>%
+  ggplot(aes(gdpPercap, lifeExp, color = continent, size = pop)) +
+  geom_point(alpha = 0.7, stroke = 0) +
+  theme_fivethirtyeight() +
+  scale_size(range = c(2, 12), guide = "none") +
+  
+  labs(x = "Income per person (GDP/capita)",
+       y = "Life Expectancy",
+       color = "Continent",
+       size = "Population",
+       title = "Comparing life expectancy with a countries GDP per capita",
+       caption = "Source: Gapminder") +
+  theme(axis.title = element_text(),
+        text = element_text(family = "Times New Roman"),
+        legend.text = element_text(size = 10)) +
+  scale_color_brewer(palette = "Set2")
+```
+
+
+```{r}
+
+```
+
