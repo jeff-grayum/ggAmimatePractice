@@ -17,6 +17,8 @@ library(tidyverse)
 library(gganimate)
 library(gapminder)
 library(ggthemes)
+#install.packages("gifski")
+library(gifski)
 ```
 
 Making base graph of gdpPerCap vs lifeExp
@@ -38,7 +40,6 @@ gapminder%>%
   geom_point(alpha = 0.7, stroke = 0) +
   theme_fivethirtyeight() +
   scale_size(range = c(2, 12), guide = "none") +
-  
   labs(x = "Income per person (GDP/capita)",
        y = "Life Expectancy",
        color = "Continent",
@@ -53,6 +54,44 @@ gapminder%>%
 
 
 ```{r}
+graph1 <- gapminder%>%
+  ggplot(aes(gdpPercap, lifeExp, color = continent, size = pop)) +
+  geom_point(alpha = 0.7, stroke = 0) +
+  theme_fivethirtyeight() +
+  scale_size(range = c(2, 12), guide = "none") +
+  scale_x_log10() +
+  labs(x = "Income per person (GDP/capita)",
+       y = "Life Expectancy",
+       color = "Continent",
+       size = "Population",
+       title = "Comparing life expectancy with a countries GDP per capita",
+       caption = "Source: Gapminder") +
+  theme(axis.title = element_text(),
+        text = element_text(family = "Times New Roman"),
+        legend.text = element_text(size = 10)) +
+  scale_color_brewer(palette = "Set2")
+```
 
+
+Now, lets use gganimate to make a dynamic graph that shows how these trends change over time.
+```{r}
+graph1animation <- graph1 +
+  transition_time(year) +
+  labs(subtitle = "Year: {frame_time}") +
+  shadow_wake(wake_length = 0.1) #this will leave a "trail" of 10% (.1) of the frames
+
+graph1animation 
+```
+
+
+Let's continue to improve our animation, and customize it.
+```{r}
+animate(graph1animation, height = 500, width = 800, fps = 25, duration = 10,
+        end_pause = 60, res = 100)
+```
+
+Now, save your graph.
+```{r}
+anim_save("gapminder_graph_GDPperCapVSlifeExp.gif")
 ```
 
