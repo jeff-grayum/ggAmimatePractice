@@ -53,26 +53,6 @@ gapminder%>%
 ```
 
 
-```{r}
-graph1 <- gapminder%>%
-  ggplot(aes(gdpPercap, lifeExp, color = continent, size = pop)) +
-  geom_point(alpha = 0.7, stroke = 0) +
-  theme_fivethirtyeight() +
-  scale_size(range = c(2, 12), guide = "none") +
-  scale_x_log10() +
-  labs(x = "Income per person (GDP/capita)",
-       y = "Life Expectancy",
-       color = "Continent",
-       size = "Population",
-       title = "Comparing life expectancy with a countries GDP per capita",
-       caption = "Source: Gapminder") +
-  theme(axis.title = element_text(),
-        text = element_text(family = "Times New Roman"),
-        legend.text = element_text(size = 10)) +
-  scale_color_brewer(palette = "Set2")
-```
-
-
 Now, lets use gganimate to make a dynamic graph that shows how these trends change over time.
 ```{r}
 graph1animation <- graph1 +
@@ -86,12 +66,77 @@ graph1animation
 
 Let's continue to improve our animation, and customize it.
 ```{r}
-animate(graph1animation, height = 500, width = 800, fps = 25, duration = 10,
-        end_pause = 60, res = 100)
+animate(graph1animation, height = 500, width = 800, fps = 50, duration = 10,
+        end_pause = 100, res = 100)
 ```
 
 Now, save your graph.
 ```{r}
 anim_save("gapminder_graph_GDPperCapVSlifeExp.gif")
+```
+
+
+Graph 2. Data gradually appearing over time.
+```{r}
+#per his example:  genre = continent, year = year, gdpPerCap = sales.
+#First, summarized your data!
+
+gapminder2 <- gapminder %>%
+  group_by(continent, year) %>%
+  summarize(meanGdp = mean(gdpPercap)) %>%
+  view()
+
+
+gapminder2 %>% 
+  ggplot(aes(year, meanGdp, color = continent)) + 
+  geom_line()
+```
+
+
+Now, for fun, we will make our graph pretty. SWEET DARKMODE GRAPH!!
+```{r}
+
+graph2 <- gapminder2 %>% 
+  ggplot(aes(year, meanGdp, color = continent)) + 
+  geom_line(size = 1.1) +
+  theme_solarized_2(light = FALSE) +
+  labs(title = "GDP per capita over time, grouped by continent",
+       subtitle = "From 1952 - 2007",
+       x = "",
+       y = "Income per person (GDP per capita)",
+       color = "Continent",
+       caption = "Source: Gapminder") +
+  theme(axis.title = element_text(),
+        text = element_text(family = "Times New Roman"),
+        legend.text = element_text(size = 10)) +
+  scale_color_brewer(palette = "Set2") + #NOTE also can set palette to "Pastel1:3"
+  geom_point() + #Adds a point to your animation, at the end of the line.
+  scale_x_continuous()
+
+```
+
+
+Animate it!  Instead of calling transition_time(), we will call transition_reveal().
+I don't really like this style of animation. :( Doesn't add much info.
+```{r}
+graph2.animate <- graph2 +
+  transition_reveal(year)
+```
+
+
+It's a dumb animation, but let's make it beautiful.
+```{r}
+graph2.animate <- graph2 +
+  transition_reveal(year) +
+  view_follow(fixed_y = TRUE) #this sets our y axis, but x axis will expand with time. It's dumb.
+```
+
+Further improvement, and saving the animation.
+
+```{r}
+animate(graph2.animate, height = 500, width = 800, fps = 50, duration = 10,
+        end_pause = 100, res = 100)
+
+anim_save("gapminder_graph_GDPperCapVStime.gif")
 ```
 
