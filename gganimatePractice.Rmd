@@ -140,3 +140,49 @@ animate(graph2.animate, height = 500, width = 800, fps = 50, duration = 10,
 anim_save("gapminder_graph_GDPperCapVStime.gif")
 ```
 
+The final animated graph will TRANSITION BETWEEN STATES!
+```{r}
+#First, download the csv file from Kraggle.  Move it into the project director, set working directory to "Project Directory", and then read_csv().  IDK if this is the ideal way to accomplish this, but it worked.
+
+reviews <- read_csv("googleplaystore.csv") %>%
+  filter(Category %in% c("GAME", "SOCIAL", "PRODUCTIVITY", "TOOLS", "EDUCATION"))
+
+#Now make a basic boxplot, showing average ratings per category.
+graph3 <- reviews %>%
+  ggplot(aes(Category, Rating, fill = Category)) +
+  geom_boxplot() 
+
+```
+
+Now let's make that boxplot beautiful.
+```{r}
+graph3 <- reviews %>%
+  ggplot(aes(Category, Rating, fill = Category)) +
+  geom_boxplot() +
+  theme_fivethirtyeight() +
+  labs(title = "Google Play Store ratings",
+       x = "Category",
+       y = "Average rating",
+       fill = "Category",
+       subtitle = "Source: Kraggle.com") +
+  theme(legend.position = "none",
+        axis.title.y = element_text(),
+        text = element_text(family = "Times New Roman"),
+        panel.grid.major.x = element_blank(),
+        axis.title.x = element_blank()) +
+  scale_fill_tableau() #nice color palette. 
+```
+
+
+Now, we will animate!
+```{r}
+graph3.animation <- graph3 +
+  transition_states(Category, wrap = FALSE) +
+  shadow_mark(alpha = 0.5) +
+  enter_grow() + #Each plot will "grow"
+  exit_fade() + #Plots will fade to alpha = 0.5 when new ones appear
+  ease_aes("back-out")
+
+anim_save("googlePlayRatingsBoxplot.gif")
+``` 
+
